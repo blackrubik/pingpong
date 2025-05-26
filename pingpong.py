@@ -33,28 +33,56 @@ class GameSprite(sprite.Sprite):
 class Player_Right(GameSprite):
     def movement(self):
         keys = key.get_pressed()
-        if keys[K_LEFT] and self.rect.y > 5:
+        if keys[K_UP] and self.rect.y > 5:
             self.rect.y -= self.speed
-        if keys[K_RIGHT] and self.rect.y < mw_width-85:
+        if keys[K_DOWN] and self.rect.y < mw_heigh:
             self.rect.y += self.speed
 
 
 class Player_Left(GameSprite):
     def movement(self):
         keys = key.get_pressed()
-        if keys[K_a] and self.rect.y > 5:
+        if keys[K_w] and self.rect.y > 5:
             self.rect.y -= self.speed
-        if keys[K_d] and self.rect.y < mw_width-85:
+        if keys[K_s] and self.rect.y < mw_width:
             self.rect.y += self.speed
 
+class Ball(GameSprite):
+    def update(self):
+        self.rect.x += self.speed        
+        self.rect.y += self.speed
+
+player_right = Player_Right('Vertical_Rectangle_Red.jpg', 650, 150, 20, 120, 5)
+player_left = Player_Left('Vertical_Rectangle_Red.jpg', 30, 150, 20, 120, 5)
+
+ball = Ball('orange_ball.png', 350, 150, 55, 55, 5)
+
 game = True
+finish = False
 
 while game:
     for e in event.get():
         if e.type == QUIT:
             game = False
 
-    mw.blit(bg, (0, 0))
+    while not finish:
+        mw.blit(bg, (0, 0))
 
-    display.update()
-    clock.tick(FPS)
+        player_right.reset()
+        player_right.movement()    
+        
+        player_left.reset()
+        player_left.movement()    
+        
+        ball.reset()
+        ball.update()
+
+        if (sprite.collide_rect(ball, player_left) or 
+        sprite.collide_rect(ball, player_right)):
+            ball.speed *= -1
+
+        if ball.rect.x >= mw_width or ball.rect.x <= 0:
+            ball.speed *= -1
+
+        display.update()
+        clock.tick(FPS)
