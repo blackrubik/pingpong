@@ -23,14 +23,15 @@ text_second_lose = style.render('Player 2 lose!', 1, (255, 0, 0))
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, 
                 player_x, player_y, 
-                player_width, player_heidh, player_speed):
+                player_width, player_heidh, player_speed_x, player_speed_y):
         super().__init__()
         self.image = transform.scale(image.load(player_image), 
                                     (player_width, player_heidh))
         self.rect = self.image.get_rect()
         self.rect.x = player_x
         self.rect.y = player_y
-        self.speed = player_speed
+        self.speed_x = player_speed_x       
+        self.speed_y = player_speed_y
 
     def reset(self):
         mw.blit(self.image, (self.rect.x, self.rect.y))
@@ -40,32 +41,31 @@ class Player_Right(GameSprite):
     def movement(self):
         keys = key.get_pressed()
         if keys[K_UP] and self.rect.y > 5:
-            self.rect.y -= self.speed
-        if keys[K_DOWN] and self.rect.y < mw_heigh:
-            self.rect.y += self.speed
+            self.rect.y -= self.speed_x
+        if keys[K_DOWN] and self.rect.y <= mw_heigh:
+            self.rect.y += self.speed_x
 
 
 class Player_Left(GameSprite):
     def movement(self):
         keys = key.get_pressed()
         if keys[K_w] and self.rect.y > 5:
-            self.rect.y -= self.speed
-            print('move')
-        if keys[K_s] and self.rect.y < mw_width:
-            self.rect.y += self.speed
+            self.rect.y -= self.speed_x
+        if keys[K_s] and self.rect.y <= mw_heigh:
+            self.rect.y += self.speed_x
 
 class Ball(GameSprite):
     def update(self):
-        self.rect.x += self.speed        
-        self.rect.y += self.speed
+        self.rect.x += self.speed_x        
+        self.rect.y += self.speed_y
 
-        if self.rect.y > mw_heigh-50 or self.rect.y < 0:
-            self.speed *= -1
+        # if self.rect.y > mw_heigh-50 or self.rect.y < 0:
+        #     self.rect.y *= -1
 
-player_right = Player_Right('player.jpg', 650, 150, 20, 120, 5)
-player_left = Player_Left('player.jpg', 30, 150, 20, 120, 5)
+player_right = Player_Right('player.jpg', 650, 150, 20, 120, 5, None)
+player_left = Player_Left('player.jpg', 30, 150, 20, 120, 5, None)
 
-ball = Ball('ball.png', 350, 150, 55, 55, 5)
+ball = Ball('ball.png', 350, 150, 55, 55, 3, 3)
 
 game = True
 finish = False
@@ -75,7 +75,7 @@ while game:
         if e.type == QUIT:
             game = False
 
-    while not finish:
+    if not finish:
         mw.blit(bg, (0, 0))
 
         player_right.reset()
@@ -89,10 +89,10 @@ while game:
 
         if (sprite.collide_rect(ball, player_left) or 
         sprite.collide_rect(ball, player_right)):
-            ball.speed *= -1
+            ball.speed_x *= -1
 
-        if ball.rect.x >= mw_width or ball.rect.x <= 0:
-            ball.speed *= -1
+        if ball.rect.y >= mw_heigh-55 or ball.rect.y <= 0:
+            ball.speed_y *= -1
 
         if ball.rect.x < 0:
             finish = True
