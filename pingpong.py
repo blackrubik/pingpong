@@ -10,9 +10,15 @@ clock = time.Clock()
 FPS = 60
 
 bg = transform.scale(
-    image.load('CAE8F3.png'),
+    image.load('bg.png'),
     (mw_width, mw_heigh)
 )
+
+font.init()
+style = font.Font(None, 36)
+text_first_lose = style.render('Player 1 lose!', 1, (255, 0, 0))
+text_second_lose = style.render('Player 2 lose!', 1, (255, 0, 0))
+
 
 class GameSprite(sprite.Sprite):
     def __init__(self, player_image, 
@@ -44,6 +50,7 @@ class Player_Left(GameSprite):
         keys = key.get_pressed()
         if keys[K_w] and self.rect.y > 5:
             self.rect.y -= self.speed
+            print('move')
         if keys[K_s] and self.rect.y < mw_width:
             self.rect.y += self.speed
 
@@ -52,10 +59,13 @@ class Ball(GameSprite):
         self.rect.x += self.speed        
         self.rect.y += self.speed
 
-player_right = Player_Right('Vertical_Rectangle_Red.jpg', 650, 150, 20, 120, 5)
-player_left = Player_Left('Vertical_Rectangle_Red.jpg', 30, 150, 20, 120, 5)
+        if self.rect.y > mw_heigh-50 or self.rect.y < 0:
+            self.speed *= -1
 
-ball = Ball('orange_ball.png', 350, 150, 55, 55, 5)
+player_right = Player_Right('player.jpg', 650, 150, 20, 120, 5)
+player_left = Player_Left('player.jpg', 30, 150, 20, 120, 5)
+
+ball = Ball('ball.png', 350, 150, 55, 55, 5)
 
 game = True
 finish = False
@@ -83,6 +93,14 @@ while game:
 
         if ball.rect.x >= mw_width or ball.rect.x <= 0:
             ball.speed *= -1
+
+        if ball.rect.x < 0:
+            finish = True
+            mw.blit(text_first_lose, (200, 200))   
+
+        if ball.rect.x > mw_width:
+            finish = True
+            mw.blit(text_second_lose, (200, 200))
 
         display.update()
         clock.tick(FPS)
